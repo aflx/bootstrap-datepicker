@@ -3,7 +3,7 @@
  * http://www.eyecon.ro/bootstrap-datepicker
  * =========================================================
  * Copyright 2012 Stefan Petre
- * Improvements by Andrew Rowls
+ * Improvements by Andrew Rowls and Alexander Heinrich
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,8 @@
 				this.element.on('click', $.proxy(this.show, this));
 			}
 		}
+
+        this.filter = options.filter||null;
 
 		this.autoclose = false;
 		if ('autoclose' in options) {
@@ -215,6 +217,14 @@
 			this.fill();
 		},
 
+        checkDate: function(date, filter) {
+            var func = DPGlobal.intervals[filter.interval_type].check,
+                cleaned1 = new Date(filter.start.getFullYear(), filter.start.getUTCMonth(), filter.start.getUTCDate() + 1),
+                cleaned2 = new Date(date.getFullYear(), date.getUTCMonth(), date.getUTCDate() + 1);
+
+            return func(cleaned1, cleaned2, filter.interval||1);
+        },
+
 		fillDow: function(){
 			var dowCnt = this.weekStart;
 			var html = '<tr>';
@@ -272,6 +282,9 @@
 				if (prevMonth.valueOf() < this.startDate || prevMonth.valueOf() > this.endDate) {
 					clsName += ' disabled';
 				}
+                if (this.filter && !this.checkDate(prevMonth, this.filter)) {
+                    clsName += ' disabled';
+                }
 				html.push('<td class="day'+clsName+'">'+prevMonth.getDate() + '</td>');
 				if (prevMonth.getDay() == this.weekEnd) {
 					html.push('</tr>');
@@ -607,6 +620,37 @@
 				navFnc: 'FullYear',
 				navStep: 10
 		}],
+		intervals: {
+            dayly: {
+                check: function(date1, date2, interval) {
+                    return true;
+                }
+            },
+            weekly: {
+                check: function(date1, date2, interval) {
+                    var diff = parseInt(Math.abs((date2.getTime()-date1.getTime())/(24*3600*1000))),
+                        mod = diff % (7 * interval);
+
+                    return mod == 0;
+                }
+            },
+            monthly: {
+                check: function(date1, date2, interval) {
+                    var diff = parseInt(Math.abs(date1.getUTCMonth() - date2.getUTCMonth())),
+                        mod = diff % interval;
+
+                    return (date1.getUTCDate() == date2.getUTCDate()) && (mod == 0);
+                }
+            },
+            yearly: {
+                check: function(date1, date2, interval) {
+                    var diff = parseInt(Math.abs(date1.getFullYear() - date2.getFullYear())),
+                        mod = diff % interval;
+
+                    return (date1.getUTCDate() == date2.getUTCDate()) && (date1.getUTCMonth() == date2.getUTCMonth()) && (mod == 0);
+                }
+            }
+        },
 		isLeapYear: function (year) {
 			return (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0))
 		},

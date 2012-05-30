@@ -100,6 +100,23 @@ A standalone .css file (including necessary dropdown styles and alternative, tex
 
 All options that take a "Date" can handle a `Date` object; a String formatted according to the given `format`; or a timedelta relative to today, eg '-1d', '+6m +1y', etc, where valid units are 'd' (day), 'w' (week), 'm' (month), and 'y' (year).
 
+### filter
+
+Object. Default: None
+
+interval_type can be: daily, weekly, monthly and yearly
+
+Example:
+
+	filter: {
+    	interval_type: 'weekly',
+    	interval: '2',
+    	start: new Date()
+	}
+	
+Note: This function will not check if a month has 29, 30 or 31 days.
+
+
 ### format
 
 String.  Default: 'mm/dd/yyyy'
