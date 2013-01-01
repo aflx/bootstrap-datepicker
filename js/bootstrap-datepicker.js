@@ -220,7 +220,7 @@
 
         checkDate: function(date, filter) {
             var func = DPGlobal.intervals[filter.interval_type].check,
-                cleaned1 = new Date(filter.start.getFullYear(), filter.start.getUTCMonth(), filter.start.getUTCDate() + 1),
+                cleaned1 = new Date(filter.start.getFullYear(), filter.start.getMonth(), filter.start.getDate()),
                 cleaned2 = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
             return func(cleaned1, cleaned2, filter.interval||1);
