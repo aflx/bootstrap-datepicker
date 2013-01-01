@@ -203,6 +203,7 @@
 		},
 
 		update: function(){
+
 			this.date = DPGlobal.parseDate(
 				this.isInput ? this.element.prop('value') : this.element.data('date') || this.element.find('input').prop('value'),
 				this.format, this.language
@@ -220,7 +221,7 @@
         checkDate: function(date, filter) {
             var func = DPGlobal.intervals[filter.interval_type].check,
                 cleaned1 = new Date(filter.start.getFullYear(), filter.start.getUTCMonth(), filter.start.getUTCDate() + 1),
-                cleaned2 = new Date(date.getFullYear(), date.getUTCMonth(), date.getUTCDate() + 1);
+                cleaned2 = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
             return func(cleaned1, cleaned2, filter.interval||1);
         },
@@ -621,30 +622,33 @@
 				navStep: 10
 		}],
 		intervals: {
-            dayly: {
+            days: {
                 check: function(date1, date2, interval) {
-                    return true;
+                    var diff = Math.ceil(Math.abs((date2.getTime()-date1.getTime())/(24*3600*1000))),
+                        mod = diff % interval;
+
+                    return mod == 0;
                 }
             },
-            weekly: {
+            weeks: {
                 check: function(date1, date2, interval) {
-                    var diff = parseInt(Math.abs((date2.getTime()-date1.getTime())/(24*3600*1000))),
+                    var diff = Math.ceil(Math.abs((date2.getTime()-date1.getTime())/(24*3600*1000))),
                         mod = diff % (7 * interval);
 
                     return mod == 0;
                 }
             },
-            monthly: {
+            months: {
                 check: function(date1, date2, interval) {
-                    var diff = parseInt(Math.abs(date1.getUTCMonth() - date2.getUTCMonth())),
+                    var diff = Math.ceil(Math.abs(date1.getUTCMonth() - date2.getUTCMonth())),
                         mod = diff % interval;
 
                     return (date1.getUTCDate() == date2.getUTCDate()) && (mod == 0);
                 }
             },
-            yearly: {
+            years: {
                 check: function(date1, date2, interval) {
-                    var diff = parseInt(Math.abs(date1.getFullYear() - date2.getFullYear())),
+                    var diff = Math.ceil(Math.abs(date1.getFullYear() - date2.getFullYear())),
                         mod = diff % interval;
 
                     return (date1.getUTCDate() == date2.getUTCDate()) && (date1.getUTCMonth() == date2.getUTCMonth()) && (mod == 0);
@@ -694,7 +698,7 @@
 							break;
 					}
 				}
-				return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
+				return new Date(date.getFullYear(), date.getMonth() -1, date.getDate(), 0, 0, 0);
 			}
 			var parts = date ? date.match(this.nonpunctuation) : [],
 				date = new Date(),
@@ -792,4 +796,4 @@
 							'</div>'+
 						'</div>';
 
-}( window.jQuery )
+}( window.jQuery );
